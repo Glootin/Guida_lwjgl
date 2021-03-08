@@ -34,7 +34,7 @@ public class Main {
     private static void loop() {
         double time;
         double sum = 0;
-        double interval = 1d / 30d;
+        double interval = 1d / 60d;
 
         //Il loop di aggiornamento continua fino a una richiesta di interruzione dell'utente
         while (!glfwWindowShouldClose(windowIndex)) {
