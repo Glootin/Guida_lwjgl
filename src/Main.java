@@ -1,9 +1,11 @@
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
-import java.lang.Math;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -23,11 +25,16 @@ public class Main {
 
     static float speedx = 0, speedy = 0, rotSpeed = 0, scaleSpeed = 0, redSpeed = 0, greenSpeed = 0, blueSpeed = 0;
 
+    static Mesh mesh;
+
 
     public static void main(String[] args) {
         initWindow();
+        initLight();
         initLoop();
         initPolygon();
+        initMesh();
+        initMesh();
         loop();
     }
 
@@ -112,7 +119,7 @@ public class Main {
         posx += speedx;
         rotation += rotSpeed;
 
-        scale+= scaleSpeed;
+        scale += scaleSpeed;
         red = red + redSpeed <= 1 ? red + redSpeed : 0;
         green = green + greenSpeed <= 1 ? green + greenSpeed : 0;
         blue = blue + blueSpeed <= 1 ? blue + blueSpeed : 0;
@@ -120,23 +127,48 @@ public class Main {
 
     private static void render() {
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //Inizia il rendering sotto forma di poligono
-        glBegin(GL_POLYGON);
+        float[] no_mat = {0.0f, 0.0f, 0.0f, 1.0f};
+        float[] mat_diffuse = {red, green, blue, 1.0f};
+        float[] mat_specular = {0.0f, 1.0f, 1.0f, 1.0f};
+        float[] low_shininess = {5.0f, 5.0f, 5.0f, 5.0f};
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_diffuse);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
+        glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
+
         //imposta il colore del poligono generato
         glColor3f(red, green, blue);
         //creo la matrice delle trasformate
         Matrix4f matr = new Matrix4f();
-        //applico le trasformate e poi moltiplico ogni vertice per la matrice
-        matr.identity().translate(posx, posy, 0)
-                .rotateZ((float) Math.toRadians(rotation))
-                .scale(scale);
-        polygon.forEach(vec -> {
-            var v = new Vector4f(vec.x, vec.y, vec.z, 1);
-            v.mul(matr);
-            glVertex3f(v.x, v.y, 0);
-        });
+
+        if (mesh == null) {
+            //Inizia il rendering sotto forma di poligono
+            glBegin(GL_POLYGON);
+
+            //applico le trasformate e poi moltiplico ogni vertice per la matrice
+            matr.identity().translate(posx, posy, 0)
+                    .rotateZ((float) Math.toRadians(rotation))
+                    .scale(scale);
+            polygon.forEach(vec -> {
+                var v = new Vector4f(vec.x, vec.y, vec.z, 1);
+                v.mul(matr);
+                glVertex3f(v.x, v.y, 0);
+            });
+        } else {
+            //Inizia il rendering sotto forma di poligono
+            glBegin(GL_TRIANGLES);
+            mesh.posX = posx;
+            mesh.posY = posy;
+            mesh.rotY = rotation;
+            mesh.scale = scale;
+            mesh.render();
+        }
+
         //fine del rendering, flush e swap del buffer della schermata
         glEnd();
         glFlush();
@@ -177,7 +209,7 @@ public class Main {
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 
-        //Posizione la
+        //Posizione la finestra al centro del monitor principale
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(
                 windowIndex,
@@ -207,6 +239,30 @@ public class Main {
         glfwShowWindow(windowIndex);
     }
 
+    public static void initMesh() {
+        try {
+            mesh = Mesh.generateMesh("bunny.obj");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void initLight() {
+        float[] ambient = {1.0f, 1.0f, 1.0f, 0.0f};
+        float[] diffuse = {1.0f, 1.0f, 1.0f, 10f};
+        float[] position = {0.0f, 3.0f, 2.0f, 0.0f};
+        float[] lmodel_amb = {0.4f, 0.4f, 0.4f, 1.0f};
+        float[] local_view = {0, 0, 0, 0};
+        glEnable(GL_DEPTH_TEST);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+        glLightfv(GL_LIGHT0, GL_POSITION, position);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_amb);
+        glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
+    }
 
     public static void initPolygon() {
         polygon.add(new Vector3f(0, 1f, 0));
