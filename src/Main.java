@@ -33,8 +33,7 @@ public class Main {
         initLight();
         initLoop();
         initPolygon();
-        initMesh();
-        initMesh();
+//        initMesh();
         loop();
     }
 
