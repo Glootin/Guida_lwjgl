@@ -25,7 +25,7 @@ public class Main {
 
     static float speedx = 0, speedy = 0, rotSpeed = 0, scaleSpeed = 0, redSpeed = 0, greenSpeed = 0, blueSpeed = 0;
 
-    static final boolean loadmesh = false;
+    static final boolean loadmesh = true;
 
     static Mesh mesh;
 
@@ -133,7 +133,7 @@ public class Main {
 
         float[] no_mat = {0.0f, 0.0f, 0.0f, 1.0f};
         float[] mat_diffuse = {red, green, blue, 1.0f};
-        float[] mat_specular = {0.0f, 1.0f, 1.0f, 1.0f};
+        float[] mat_specular = {red / 2, green / 2, blue, 1.0f};
         float[] low_shininess = {5.0f, 5.0f, 5.0f, 5.0f};
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -145,7 +145,6 @@ public class Main {
         glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
 
         //imposta il colore del poligono generato
-        glColor3f(red, green, blue);
         //creo la matrice delle trasformate
         Matrix4f matr = new Matrix4f();
 
@@ -253,7 +252,7 @@ public class Main {
     private static void initLight() {
         float[] ambient = {1.0f, 1.0f, 1.0f, 0.0f};
         float[] diffuse = {1.0f, 1.0f, 1.0f, 10f};
-        float[] position = {0.0f, 3.0f, 2.0f, 0.0f};
+        float[] position = {0.0f, 0, 2.0f, 0.0f};
         float[] lmodel_amb = {0.4f, 0.4f, 0.4f, 1.0f};
         float[] local_view = {0, 0, 0, 0};
         glEnable(GL_DEPTH_TEST);

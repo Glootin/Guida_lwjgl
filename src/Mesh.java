@@ -13,14 +13,15 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 public class Mesh {
     private static class Face {
         public ArrayList<Integer> vertices = new ArrayList<>();
+        public ArrayList<Integer> texture = new ArrayList<>();
         public ArrayList<Integer> normals = new ArrayList<>();
 
         public Face(String[] values) {
             for (int i = 1; i < values.length; i++) {
                 var value = values[i];
                 var tmp = value.split("/");
-                System.out.println(tmp[0] + " " + tmp[2]);
                 vertices.add(Integer.parseInt(tmp[0]));
+                if(!tmp[1].trim().isEmpty()) texture.add(Integer.parseInt(tmp[1]));
                 normals.add(Integer.parseInt(tmp[2]));
             }
 
