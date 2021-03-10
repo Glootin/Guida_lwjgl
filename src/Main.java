@@ -25,6 +25,8 @@ public class Main {
 
     static float speedx = 0, speedy = 0, rotSpeed = 0, scaleSpeed = 0, redSpeed = 0, greenSpeed = 0, blueSpeed = 0;
 
+    static final boolean loadmesh = false;
+
     static Mesh mesh;
 
 
@@ -32,8 +34,10 @@ public class Main {
         initWindow();
         initLight();
         initLoop();
-        initPolygon();
-//        initMesh();
+        if (!loadmesh)
+            initPolygon();
+        else
+            initMesh();
         loop();
     }
 
@@ -133,7 +137,7 @@ public class Main {
         float[] low_shininess = {5.0f, 5.0f, 5.0f, 5.0f};
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+        glColorMaterial(GL_FRONT_AND_BACK, GL_EMISSION);
         glMaterialfv(GL_FRONT, GL_AMBIENT, mat_diffuse);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
         glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
